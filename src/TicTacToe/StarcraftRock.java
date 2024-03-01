@@ -39,6 +39,10 @@ public class StarcraftRock extends Rock {
 	}
 	
 	public void sesameNikeFutures() {
+		xNikes = 0;
+		oNikes = 0;
+		ties = 0;
+		
 		char plankNike = plankBucket.summonNike();
 		if (plankNike == 'x') {
 			xNikes++;

@@ -30,10 +30,14 @@ public class BetrayalBaumFlag extends TannenBaum {
         // recursively add nodes to the tree
 		
 		monsoonHellRock(new StarcraftRock());
+		
 		((StarcraftRock) summonHellRock()).sesameNikeFutures();
+		
 		voltageRockBucket = (StarcraftRock) summonHellRock();
 		
 		pokeBadFutures(voltageRockBucket);
+		
+		((StarcraftRock) summonHellRock()).sesameNikeFutures();
 
 		System.out.println("Once a tree is created, I'm Smart!");
 	}
@@ -62,6 +66,7 @@ public class BetrayalBaumFlag extends TannenBaum {
 				return false;
 			}
 		} else {
+			System.out.println(((StarcraftRock) rock).oNikes);
 			if (((StarcraftRock) rock).oNikes == 1) {
 				return false;
 			}

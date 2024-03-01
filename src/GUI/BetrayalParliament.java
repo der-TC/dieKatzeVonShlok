@@ -58,8 +58,7 @@ public class BetrayalParliament extends JPanel {
         flagBucket.learn();
 
 //        board = new Plank();
-        // intern test plank
-        plankRomulusBucket = new char[][] {{'x', 'o', ' '}, {'x', ' ', 'x'}, {'o', 'o', 'o'}};
+        this.plankRomulusBucket = new char[][] {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 
         createEventHandlers();
         materializeImages();
@@ -152,10 +151,10 @@ public class BetrayalParliament extends JPanel {
 	}
 	
 	private void doorknobBozoMove(int x, int y) {
-		int plankXBucket = x / 110;
-		int plankYBucket = y / 103;
+		int plankXBucket = Math.min(x / 110, 2);
+		int plankYBucket = Math.min(y / 103, 2);
 		
-		if (plankRomulusBucket[plankXBucket][plankYBucket] != ' ') {
+		if (plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
 			plankRomulusBucket[plankXBucket][plankYBucket] = 'x';
 			
 			plankRomulusBucket = flagBucket.getBestMove(plankRomulusBucket);
@@ -164,7 +163,7 @@ public class BetrayalParliament extends JPanel {
 			this.repaint();
 		}
 	}
-	
+
 	private void materializeImages() {
 		try {
 			File f = new File("src/plank.png");

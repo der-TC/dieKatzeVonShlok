@@ -5,10 +5,7 @@ import GUI.MainFrame;
  This class does nothing but start the GUI in the GUI package.
 */
 public class Main {
-
-	
 	public static void main(String[] args) throws InterruptedException {
 		MainFrame.startGUI();
 	}
-	
 }
