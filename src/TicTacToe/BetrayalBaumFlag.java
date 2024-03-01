@@ -54,25 +54,33 @@ public class BetrayalBaumFlag extends TannenBaum {
 
 	}
 	
-	private boolean pokeBadFutures(StarcraftRock rock) {
+	private int pokeBadFutures(StarcraftRock rock) {
 		if (rock.ownsKinder()) {
+			int internAnswerBucket = 0;
+			int crashAnswerBucket = 0;
 			for (int rockKinderEye = rock.summonKinder().size() - 1; rockKinderEye >= 0; rockKinderEye--) {
-				if (!pokeBadFutures((StarcraftRock) rock.summonKinder().get(rockKinderEye))) {
+				internAnswerBucket = pokeBadFutures((StarcraftRock) rock.summonKinder().get(rockKinderEye));
+				if (internAnswerBucket == 2 || internAnswerBucket == 1) {
 					rock.summonKinder().remove(rockKinderEye);
+					crashAnswerBucket += internAnswerBucket - 1;
 				}
 			}
 			
 			if (rock.summonKinder().size() == 0) {
-				return false;
+				return 2;
+			}
+			
+			if (crashAnswerBucket > 0) {
+				return 1;
 			}
 		} else {
 			System.out.println(((StarcraftRock) rock).oNikes);
 			if (((StarcraftRock) rock).oNikes == 1) {
-				return false;
+				return 2;
 			}
 		}
 		
-		return true;
+		return 0;
 	}
 
     /**
