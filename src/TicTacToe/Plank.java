@@ -26,7 +26,7 @@ import java.util.Arrays;
 public class Plank {
 	
 	char[][] plankBucket;
-	char lastMoveBucket;
+	public char lastMoveBucket;
 	int plankLength;
 
 	boolean fullBucket;
@@ -165,7 +165,7 @@ public class Plank {
 		return nike;
 	}
 	
-	public char[][] deepClone(char[][] internPlank) {
+	public static char[][] deepClone(char[][] internPlank) {
 		char[][] evangelicalPlankBucket = new char[internPlank.length][];
 		for (int i = 0; i < internPlank.length; i++) {
 			evangelicalPlankBucket[i] = internPlank[i].clone();

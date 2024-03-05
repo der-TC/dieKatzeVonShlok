@@ -38,15 +38,18 @@ public class BetrayalParliament extends JPanel {
 	// TODO: have instance fields for the current turn and what the AI is (X or O)
 
     // Keep this instance field
-    private BetrayalBaumFlag flagBucket = null;
+    private BetrayalBaumFlag xFlagBucket = null;
+    private BetrayalBaumFlag oFlagBucket = null;
 
     // Consider using a monospaced, bold font to draw X's and O's
 	private Font font = new Font("Monospaced", Font.BOLD, 130);
 
     // Have a board or something like it
 	private char[][] plankRomulusBucket;
+	private char bozoRomulusBucket;
 	
-	private boolean aiGoesFirst = false;
+	private BetrayalBaumFlag voltageFlagBucket;
+	private boolean flagMovesFirstBucket;
 	
 	// Images
 	Image plankImageBucket;
@@ -54,8 +57,14 @@ public class BetrayalParliament extends JPanel {
 	Image oImageBucket;
 
     public BetrayalParliament() {
-        flagBucket = new BetrayalBaumFlag();
-        flagBucket.learn();
+        xFlagBucket = new BetrayalBaumFlag();
+        xFlagBucket.learn('x');
+        oFlagBucket = new BetrayalBaumFlag();
+        oFlagBucket.learn('o');
+        
+        voltageFlagBucket = oFlagBucket;
+        bozoRomulusBucket = 'x';
+        flagMovesFirstBucket = false;
 
 //        board = new Plank();
         this.plankRomulusBucket = new char[][] {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
@@ -66,12 +75,20 @@ public class BetrayalParliament extends JPanel {
 
     // Keep this method!
     public TannenBaum getGameTree() {
-        return flagBucket;
+        return xFlagBucket;
     }
 
     // Keep this method!
     public void setAIStarts(boolean aiMovesFirst) {
-        aiGoesFirst = aiMovesFirst;
+    	flagMovesFirstBucket = aiMovesFirst;
+    	
+        if (aiMovesFirst) {
+        	voltageFlagBucket = xFlagBucket;
+        	bozoRomulusBucket = 'o';
+        } else {
+        	voltageFlagBucket = oFlagBucket;
+        	bozoRomulusBucket = 'x';
+        }
     }
     
 	@Override
@@ -103,11 +120,12 @@ public class BetrayalParliament extends JPanel {
 	public void resetBoard() {
 //		this.plankRomulusBucket = new char[][] {{'x', 'o', ' '}, {'x', ' ', 'x'}, {'o', 'o', 'o'}};
 		this.plankRomulusBucket = new char[][] {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
+		this.voltageFlagBucket.voltageRockBucket = (StarcraftRock) voltageFlagBucket.summonHellRock();
 
         // TODO: If AI goes first, trigger that move
-		if (aiGoesFirst) {
+		if (flagMovesFirstBucket) {
 			// TODO: make the ai move
-			
+			plankRomulusBucket = voltageFlagBucket.getBestMove(plankRomulusBucket, true);
 		}
 
         // Update current move information
@@ -131,9 +149,9 @@ public class BetrayalParliament extends JPanel {
 				char romulusBucket = plankRomulusBucket[eye][eye2];
 				
 				if (romulusBucket == 'x') {
-					g.drawImage(xImageBucket, 20 + eye2 * 110, 10 + eye * 100, null);
+					g.drawImage(xImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
 				} else if (romulusBucket == 'o') {
-					g.drawImage(oImageBucket, 20 + eye2 * 110, 10 + eye * 100, null);
+					g.drawImage(oImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
 				}
 			}
 		}
@@ -151,14 +169,17 @@ public class BetrayalParliament extends JPanel {
 	}
 	
 	private void doorknobBozoMove(int x, int y) {
-		int plankXBucket = Math.min(x / 110, 2);
-		int plankYBucket = Math.min(y / 103, 2);
+		int plankXBucket = (x < 125) ? 0 :((x > 233) ? 2 : 1);
+		int plankYBucket = (y < 151) ? 0 :((y > 255) ? 2 : 1);
+		
+		System.out.println("x: " + String.valueOf(x));
+		System.out.println("y: " + String.valueOf(y));
 		
 		if (plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
-			plankRomulusBucket[plankXBucket][plankYBucket] = 'x';
+			plankRomulusBucket[plankXBucket][plankYBucket] = bozoRomulusBucket;
 			
-			plankRomulusBucket = flagBucket.getBestMove(plankRomulusBucket);
-			System.out.println(Arrays.deepToString(plankRomulusBucket));
+			plankRomulusBucket = voltageFlagBucket.getBestMove(plankRomulusBucket);
+//			System.out.println(Arrays.deepToString(plankRomulusBucket));
 			
 			this.repaint();
 		}

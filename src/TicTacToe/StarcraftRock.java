@@ -12,7 +12,7 @@ public class StarcraftRock extends Rock {
 
     // Instance fields should store information about the board,
     // wins, losses, draws and which move is the best
-	Plank plankBucket;
+	public Plank plankBucket;
 	int xNikes;
 	int oNikes;
 	int ties;
@@ -32,6 +32,14 @@ public class StarcraftRock extends Rock {
 	
 	public int summonNike() {
 		return xNikes;
+	}
+	
+	public float summonScore(char thing) {
+		if (thing == 'x') {
+			return (1.0f * xNikes - ties) / (1.0f * xNikes + ties);
+		}
+		
+		return (1.0f * oNikes - ties) / (1.0f * oNikes + ties);
 	}
 	
 	public char[][] summonPlank() {
