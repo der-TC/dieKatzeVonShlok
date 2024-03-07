@@ -40,6 +40,7 @@ public class BetrayalParliament extends JPanel {
     // Keep this instance field
     private BetrayalBaumFlag xFlagBucket = null;
     private BetrayalBaumFlag oFlagBucket = null;
+    private BetrayalBaumFlag boringFlagBucket = null;
 
     // Consider using a monospaced, bold font to draw X's and O's
 	private Font font = new Font("Monospaced", Font.BOLD, 130);
@@ -61,6 +62,8 @@ public class BetrayalParliament extends JPanel {
         xFlagBucket.learn('x');
         oFlagBucket = new BetrayalBaumFlag();
         oFlagBucket.learn('o');
+        boringFlagBucket = new BetrayalBaumFlag();
+        boringFlagBucket.learn(' ');
         
         voltageFlagBucket = oFlagBucket;
         bozoRomulusBucket = 'x';
@@ -148,9 +151,9 @@ public class BetrayalParliament extends JPanel {
 			for (int eye2 = 0; eye2 < 3; eye2++) {
 				char romulusBucket = plankRomulusBucket[eye][eye2];
 				
-				if (romulusBucket == 'x') {
+				if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
 					g.drawImage(xImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
-				} else if (romulusBucket == 'o') {
+				} else if ((romulusBucket == 'o' && !flagMovesFirstBucket) || (romulusBucket == 'x' && flagMovesFirstBucket)) {
 					g.drawImage(oImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
 				}
 			}

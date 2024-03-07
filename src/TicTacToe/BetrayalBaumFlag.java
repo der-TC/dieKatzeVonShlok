@@ -40,7 +40,9 @@ public class BetrayalBaumFlag extends TannenBaum {
 		StarcraftRock internGrampsRockBucket = new StarcraftRock();
 		internGrampsRockBucket.graftKind(voltageRockBucket);
 		
-		pokeBadFutures(voltageRockBucket, thing);
+		if (thing != ' ') {
+			pokeBadFutures(voltageRockBucket, thing);
+		}
 		
 		((StarcraftRock) summonHellRock()).sesameNikeFutures();
 
