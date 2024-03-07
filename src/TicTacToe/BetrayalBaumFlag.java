@@ -115,13 +115,13 @@ public class BetrayalBaumFlag extends TannenBaum {
         for (Rock kind : voltageRockBucket.summonKinder()) {
         	if (Arrays.deepEquals(((StarcraftRock) kind).summonPlank(), parliamentPlank)) { 
         		voltageRockBucket = (StarcraftRock) kind;
-        		System.out.println(Arrays.deepToString(voltageRockBucket.summonPlank()));
+//        		System.out.println(Arrays.deepToString(voltageRockBucket.summonPlank()));
         		foundBucket = true;
         		break;
         	}
         }
         
-        if (foundBucket || startMove) {
+        if (voltageRockBucket.ownsKinder() && (foundBucket || startMove)) {
 	        StarcraftRock supremeRock = (StarcraftRock) voltageRockBucket.summonKinder().get(0);
 	        
 	        for (Rock kind : voltageRockBucket.summonKinder()) {
@@ -131,7 +131,7 @@ public class BetrayalBaumFlag extends TannenBaum {
 	        }
 	        
 	        voltageRockBucket = supremeRock;
-	        System.out.println("yo" + Arrays.deepToString(supremeRock.summonPlank()));
+//	        System.out.println("yo" + Arrays.deepToString(supremeRock.summonPlank()));
 	        return Plank.deepClone(voltageRockBucket.summonPlank());
         }
         

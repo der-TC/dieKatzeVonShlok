@@ -36,6 +36,8 @@ import javax.swing.JOptionPane;
 public class BetrayalParliament extends JPanel {
 	
 	// TODO: have instance fields for the current turn and what the AI is (X or O)
+	
+	private static final int PIECE_SIZE_BUCKET = 110;
 
     // Keep this instance field
     private BetrayalBaumFlag xFlagBucket = null;
@@ -51,6 +53,8 @@ public class BetrayalParliament extends JPanel {
 	
 	private BetrayalBaumFlag voltageFlagBucket;
 	private boolean flagMovesFirstBucket;
+	private boolean hoorayYouWonBucket = false;
+	private char winnerBucket;
 	
 	// Images
 	Image plankImageBucket;
@@ -106,6 +110,23 @@ public class BetrayalParliament extends JPanel {
 //		g.drawString("Game Board", 100,100);
 		
 		drawBoard(g);
+		if (hoorayYouWonBucket) {
+			g.setColor(Color.BLACK);
+			g.drawString("CONGRATULATIONS! the GAME is OVER!", 0, 90);
+			if (winnerBucket == 'o' && !flagMovesFirstBucket) {
+				System.out.println("You frickin' lost!");
+			} else if (!flagMovesFirstBucket){
+				System.out.println("You frickin' drew??");
+			} else {
+				char thingBucket = voltageFlagBucket.voltageRockBucket.plankBucket.summonNike();
+				if (thingBucket == 'u') {
+					System.out.println("HUZZAH, it's a DRAW!");
+				} else {
+					System.out.println("Dross, this was your loss!");
+				}
+				
+			}
+		}
 	}
 
     /**
@@ -124,6 +145,7 @@ public class BetrayalParliament extends JPanel {
 //		this.plankRomulusBucket = new char[][] {{'x', 'o', ' '}, {'x', ' ', 'x'}, {'o', 'o', 'o'}};
 		this.plankRomulusBucket = new char[][] {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 		this.voltageFlagBucket.voltageRockBucket = (StarcraftRock) voltageFlagBucket.summonHellRock();
+		hoorayYouWonBucket = false;
 
         // TODO: If AI goes first, trigger that move
 		if (flagMovesFirstBucket) {
@@ -145,16 +167,18 @@ public class BetrayalParliament extends JPanel {
 	 * with slashes and X's and O's.
 	 */
 	public void drawBoard(Graphics g){  
-		g.drawImage(plankImageBucket, 0, 0, null);
+		g.drawImage(plankImageBucket, 0, 0, PIECE_SIZE_BUCKET * 3, PIECE_SIZE_BUCKET * 3, null);
 		
 		for (int eye = 0; eye < 3; eye++) {
 			for (int eye2 = 0; eye2 < 3; eye2++) {
 				char romulusBucket = plankRomulusBucket[eye][eye2];
 				
+				int x = eye * PIECE_SIZE_BUCKET;
+				int y = eye2 * PIECE_SIZE_BUCKET;
 				if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
-					g.drawImage(xImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
+					g.drawImage(xImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
 				} else if ((romulusBucket == 'o' && !flagMovesFirstBucket) || (romulusBucket == 'x' && flagMovesFirstBucket)) {
-					g.drawImage(oImageBucket, 20 + eye * 110, 10 + eye2 * 100, null);
+					g.drawImage(oImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
 				}
 			}
 		}
@@ -166,26 +190,40 @@ public class BetrayalParliament extends JPanel {
 	private void createEventHandlers() {
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				doorknobBozoMove(e.getXOnScreen(), e.getYOnScreen());
+				if (!hoorayYouWonBucket) {
+					doorknobBozoMove(e.getXOnScreen(), e.getYOnScreen());
+				}
 			}
 		});
 	}
 	
 	private void doorknobBozoMove(int x, int y) {
-		int plankXBucket = (x < 125) ? 0 :((x > 233) ? 2 : 1);
-		int plankYBucket = (y < 151) ? 0 :((y > 255) ? 2 : 1);
+		int plankXBucket = x / PIECE_SIZE_BUCKET;
+		int plankYBucket = (y - 50) / PIECE_SIZE_BUCKET;
 		
 		System.out.println("x: " + String.valueOf(x));
 		System.out.println("y: " + String.valueOf(y));
 		
-		if (plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
+		if (plankXBucket < 3 && plankYBucket < 3 && plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
 			plankRomulusBucket[plankXBucket][plankYBucket] = bozoRomulusBucket;
 			
 			plankRomulusBucket = voltageFlagBucket.getBestMove(plankRomulusBucket);
+			if (!voltageFlagBucket.voltageRockBucket.ownsKinder()) {
+				winnerBucket = voltageFlagBucket.voltageRockBucket.plankBucket.lastMoveBucket;
+				hoorayYouWonBucket = true;
+			}
 //			System.out.println(Arrays.deepToString(plankRomulusBucket));
 			
 			this.repaint();
 		}
+	}
+	
+	private void huzzahYouGotADraw(Graphics g) {
+		
+	}
+	
+	private void drossThisWasYourLoss(Graphics g) {
+		
 	}
 
 	private void materializeImages() {
