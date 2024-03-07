@@ -114,15 +114,15 @@ public class BetrayalParliament extends JPanel {
 			g.setColor(Color.BLACK);
 			g.drawString("CONGRATULATIONS! the GAME is OVER!", 0, 90);
 			if (winnerBucket == 'o' && !flagMovesFirstBucket) {
-				System.out.println("You frickin' lost!");
+				drossThisWasYourLoss(g);
 			} else if (!flagMovesFirstBucket){
-				System.out.println("You frickin' drew??");
+				huzzahYouGotADraw(g);
 			} else {
 				char thingBucket = voltageFlagBucket.voltageRockBucket.plankBucket.summonNike();
 				if (thingBucket == 'u') {
-					System.out.println("HUZZAH, it's a DRAW!");
+					huzzahYouGotADraw(g);
 				} else {
-					System.out.println("Dross, this was your loss!");
+					drossThisWasYourLoss(g);
 				}
 				
 			}
