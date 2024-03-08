@@ -82,7 +82,7 @@ public class BetrayalParliament extends JPanel {
 
     // Keep this method!
     public TannenBaum getGameTree() {
-        return xFlagBucket;
+        return boringFlagBucket;
     }
 
     // Keep this method!
@@ -219,11 +219,11 @@ public class BetrayalParliament extends JPanel {
 	}
 	
 	private void huzzahYouGotADraw(Graphics g) {
-		
+		System.out.println("Huzzah, you got a draw!");
 	}
 	
 	private void drossThisWasYourLoss(Graphics g) {
-		
+		System.out.println("Dross, this was your loss!");
 	}
 
 	private void materializeImages() {
