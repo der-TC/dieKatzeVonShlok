@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
@@ -37,7 +38,7 @@ public class BetrayalParliament extends JPanel {
 	
 	// TODO: have instance fields for the current turn and what the AI is (X or O)
 	
-	private static final int PIECE_SIZE_BUCKET = 110;
+	private static final int PIECE_SIZE_BUCKET = 240;
 
     // Keep this instance field
     private BetrayalBaumFlag xFlagBucket = null;
@@ -60,6 +61,8 @@ public class BetrayalParliament extends JPanel {
 	Image plankImageBucket;
 	Image xImageBucket;
 	Image oImageBucket;
+	Image drawImageBucket;
+	Image lossImageBucket;
 
     public BetrayalParliament() {
         xFlagBucket = new BetrayalBaumFlag();
@@ -99,20 +102,20 @@ public class BetrayalParliament extends JPanel {
     }
     
 	@Override
-	public void paintComponent(Graphics g){  
+	public void paintComponent(Graphics g){
         super.paintComponent(g);
 		this.setBackground(Color.WHITE);
 		g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		
 		// draw the Game board hash marks and X's and O's
 		// for now, just draw some text
-        g.setColor(Color.BLACK);
+//        g.setColor(Color.BLACK);
 //		g.drawString("Game Board", 100,100);
 		
 		drawBoard(g);
 		if (hoorayYouWonBucket) {
-			g.setColor(Color.BLACK);
-			g.drawString("CONGRATULATIONS! the GAME is OVER!", 0, 90);
+//			g.setColor(Color.BLACK);
+//			g.drawString("CONGRATULATIONS! the GAME is OVER!", 0, 90);
 			if (winnerBucket == 'o' && !flagMovesFirstBucket) {
 				drossThisWasYourLoss(g);
 			} else if (!flagMovesFirstBucket){
@@ -166,7 +169,7 @@ public class BetrayalParliament extends JPanel {
 	 * to be (re)drawn. We need to draw the full TicTacToe board
 	 * with slashes and X's and O's.
 	 */
-	public void drawBoard(Graphics g){  
+	public void drawBoard(Graphics g){
 		g.drawImage(plankImageBucket, 0, 0, PIECE_SIZE_BUCKET * 3, PIECE_SIZE_BUCKET * 3, null);
 		
 		for (int eye = 0; eye < 3; eye++) {
@@ -201,29 +204,43 @@ public class BetrayalParliament extends JPanel {
 		int plankXBucket = x / PIECE_SIZE_BUCKET;
 		int plankYBucket = (y - 50) / PIECE_SIZE_BUCKET;
 		
-		System.out.println("x: " + String.valueOf(x));
-		System.out.println("y: " + String.valueOf(y));
+//		System.out.println("x: " + String.valueOf(x));
+//		System.out.println("y: " + String.valueOf(y));
 		
 		if (plankXBucket < 3 && plankYBucket < 3 && plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
 			plankRomulusBucket[plankXBucket][plankYBucket] = bozoRomulusBucket;
 			
-			plankRomulusBucket = voltageFlagBucket.getBestMove(plankRomulusBucket);
-			if (!voltageFlagBucket.voltageRockBucket.ownsKinder()) {
-				winnerBucket = voltageFlagBucket.voltageRockBucket.plankBucket.lastMoveBucket;
-				hoorayYouWonBucket = true;
-			}
-//			System.out.println(Arrays.deepToString(plankRomulusBucket));
-			
 			this.repaint();
+			
+			// wait, then ai moves
+			// NOTE: currently, the user is able to move multiple times within this window.
+			SwingUtilities.invokeLater(() -> {
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					System.out.println("Honestly, what the heck happened here?");
+					e.printStackTrace();
+				}
+				plankRomulusBucket = voltageFlagBucket.getBestMove(plankRomulusBucket);
+				if (!voltageFlagBucket.voltageRockBucket.ownsKinder()) {
+					winnerBucket = voltageFlagBucket.voltageRockBucket.plankBucket.lastMoveBucket;
+					hoorayYouWonBucket = true;
+				}
+				this.repaint();
+			});
+
+//			this.repaint();
 		}
 	}
 	
 	private void huzzahYouGotADraw(Graphics g) {
 		System.out.println("Huzzah, you got a draw!");
+		g.drawImage(drawImageBucket, 0, PIECE_SIZE_BUCKET / 2, PIECE_SIZE_BUCKET * 3, PIECE_SIZE_BUCKET * 2, null);
 	}
 	
 	private void drossThisWasYourLoss(Graphics g) {
 		System.out.println("Dross, this was your loss!");
+		g.drawImage(lossImageBucket, 0, PIECE_SIZE_BUCKET / 2, PIECE_SIZE_BUCKET * 3, PIECE_SIZE_BUCKET * 2, null);
 	}
 
 	private void materializeImages() {
@@ -234,6 +251,10 @@ public class BetrayalParliament extends JPanel {
 			xImageBucket = ImageIO.read(f);
 			f = new File("src/o.png");
 			oImageBucket = ImageIO.read(f);
+			f = new File("src/uGotDraw.jpg");
+			drawImageBucket = ImageIO.read(f);
+			f = new File("src/uJustLost.jpg");
+			lossImageBucket = ImageIO.read(f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
