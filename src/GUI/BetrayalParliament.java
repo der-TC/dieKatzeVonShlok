@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -31,6 +32,9 @@ import java.awt.Image;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
 
 
@@ -44,6 +48,9 @@ public class BetrayalParliament extends JPanel {
     private BetrayalBaumFlag xFlagBucket = null;
     private BetrayalBaumFlag oFlagBucket = null;
     private BetrayalBaumFlag boringFlagBucket = null;
+    
+	
+	public static boolean chaosBucket = false;
 
     // Consider using a monospaced, bold font to draw X's and O's
 	private Font font = new Font("Monospaced", Font.BOLD, 130);
@@ -59,10 +66,14 @@ public class BetrayalParliament extends JPanel {
 	
 	// Images
 	Image plankImageBucket;
-	Image xImageBucket;
-	Image oImageBucket;
 	Image drawImageBucket;
 	Image lossImageBucket;
+	
+	Image[] imagesArmyBucket = new Image[8];
+	
+	// Sounds
+	Clip[] soundArmyBucket;
+	Clip activeClip;
 
     public BetrayalParliament() {
         xFlagBucket = new BetrayalBaumFlag();
@@ -81,6 +92,7 @@ public class BetrayalParliament extends JPanel {
 
         createEventHandlers();
         materializeImages();
+        materializeSounds();
     }
 
     // Keep this method!
@@ -178,10 +190,19 @@ public class BetrayalParliament extends JPanel {
 				
 				int x = eye * PIECE_SIZE_BUCKET;
 				int y = eye2 * PIECE_SIZE_BUCKET;
-				if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
-					g.drawImage(xImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
+				
+				Image internImageBucket = null;
+				
+				if (chaosBucket && romulusBucket != ' ') {
+					internImageBucket = imagesArmyBucket[(int) (Math.random() * 8)];
+				} else if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
+					internImageBucket = imagesArmyBucket[7];
 				} else if ((romulusBucket == 'o' && !flagMovesFirstBucket) || (romulusBucket == 'x' && flagMovesFirstBucket)) {
-					g.drawImage(oImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
+					internImageBucket = imagesArmyBucket[6];
+				}
+				
+				if (internImageBucket != null) {
+					g.drawImage(internImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
 				}
 			}
 		}
@@ -211,6 +232,7 @@ public class BetrayalParliament extends JPanel {
 			plankRomulusBucket[plankXBucket][plankYBucket] = bozoRomulusBucket;
 			
 			this.repaint();
+			playChaosSound();
 			
 			// wait, then ai moves
 			// NOTE: currently, the user is able to move multiple times within this window.
@@ -227,6 +249,7 @@ public class BetrayalParliament extends JPanel {
 					hoorayYouWonBucket = true;
 				}
 				this.repaint();
+				playChaosSound();
 			});
 
 //			this.repaint();
@@ -245,20 +268,44 @@ public class BetrayalParliament extends JPanel {
 
 	private void materializeImages() {
 		try {
-			File f = new File("src/plank.png");
-			plankImageBucket = ImageIO.read(f);
-			f = new File("src/x.png");
-			xImageBucket = ImageIO.read(f);
-			f = new File("src/o.png");
-			oImageBucket = ImageIO.read(f);
-			f = new File("src/uGotDraw.jpg");
-			drawImageBucket = ImageIO.read(f);
-			f = new File("src/uJustLost.jpg");
-			lossImageBucket = ImageIO.read(f);
+			File fBucket = new File("src/plank.png");
+			plankImageBucket = ImageIO.read(fBucket);
+			fBucket = new File("src/x.png");
+			imagesArmyBucket[7] = ImageIO.read(fBucket);
+			fBucket = new File("src/o.png");
+			imagesArmyBucket[6] = ImageIO.read(fBucket);
+			fBucket = new File("src/uGotDraw.jpg");
+			drawImageBucket = ImageIO.read(fBucket);
+			fBucket = new File("src/uJustLost.jpg");
+			lossImageBucket = ImageIO.read(fBucket);
+			
+			for (int eye = 0; eye < 6; eye ++) {
+				fBucket = new File("src/image" + (eye + 1) + ".png");
+				imagesArmyBucket[eye] = ImageIO.read(fBucket);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private void materializeSounds() {
+		soundArmyBucket = new Clip[10]; // TODO: change number
+		try {
+			File fBucket = new File("src/tempaudio.mp3");
+			Clip c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[0] = c;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		activeClip = null; // TODO: set active clip
+	}
+	
+	private void playChaosSound() {
+		activeClip.stop();
+		activeClip = soundArmyBucket[(int) (Math.random() * soundArmyBucket.length)];
+		activeClip.start();
+	}
 
 }

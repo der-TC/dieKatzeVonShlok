@@ -232,6 +232,9 @@ public class MainFrame extends JFrame {
 		item = new JMenuItem("Human Starts", 'H');
 		item.addActionListener(e -> gamePanel.setAIStarts(false));
 		menu.add(item);
+		item = new JMenuItem("Chaos", 'C');
+		item.addActionListener(e -> BetrayalParliament.chaosBucket = true);
+		menu.add(item);
         item = new JMenuItem("Restart");
 		item.addActionListener(e -> gamePanel.resetBoard());
         menu.add(item);
