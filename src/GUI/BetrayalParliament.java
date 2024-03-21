@@ -17,6 +17,7 @@ import TicTacToe.Plank;
 import TicTacToe.StarcraftRock;
 import TicTacToe.Move;
 import TicTacToe.BetrayalBaumFlag;
+import TicTacToe.Cart;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,7 +51,7 @@ public class BetrayalParliament extends JPanel {
     private BetrayalBaumFlag boringFlagBucket = null;
     
 	
-	public static boolean chaosBucket = false;
+	public static int chaosBucket = 0;
 
     // Consider using a monospaced, bold font to draw X's and O's
 	private Font font = new Font("Monospaced", Font.BOLD, 130);
@@ -64,12 +65,17 @@ public class BetrayalParliament extends JPanel {
 	private boolean hoorayYouWonBucket = false;
 	private char winnerBucket;
 	
+	Cart cartBucket = new Cart();
+	
 	// Images
 	Image plankImageBucket;
 	Image drawImageBucket;
 	Image lossImageBucket;
 	
 	Image[] imagesArmyBucket = new Image[8];
+	
+	boolean xParkourBucket = false;
+	boolean yParkourBucket = false;
 	
 	// Sounds
 	Clip[] soundArmyBucket;
@@ -188,21 +194,36 @@ public class BetrayalParliament extends JPanel {
 			for (int eye2 = 0; eye2 < 3; eye2++) {
 				char romulusBucket = plankRomulusBucket[eye][eye2];
 				
+//				if (chaosBucket == 0) {
+//					xParkourBucket = (int) (Math.random() * 2) == 0 ? true : false;
+//					yParkourBucket = (int) (Math.random() * 2) == 0 ? true : false;
+//					
+//					romulusBucket = plankRomulusBucket[2 - eye][2 - eye2];
+//				}
+				
 				int x = eye * PIECE_SIZE_BUCKET;
 				int y = eye2 * PIECE_SIZE_BUCKET;
 				
-				Image internImageBucket = null;
-				
-				if (chaosBucket && romulusBucket != ' ') {
-					internImageBucket = imagesArmyBucket[(int) (Math.random() * 8)];
-				} else if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
-					internImageBucket = imagesArmyBucket[7];
-				} else if ((romulusBucket == 'o' && !flagMovesFirstBucket) || (romulusBucket == 'x' && flagMovesFirstBucket)) {
-					internImageBucket = imagesArmyBucket[6];
-				}
-				
-				if (internImageBucket != null) {
-					g.drawImage(internImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
+				if (chaosBucket != 2) {
+					Image internImageBucket = null;
+					
+					if (chaosBucket == 1 && romulusBucket != ' ') {
+						internImageBucket = imagesArmyBucket[(int) (Math.random() * 8)];
+					} else if ((romulusBucket == 'x' && !flagMovesFirstBucket) || (romulusBucket == 'o' && flagMovesFirstBucket)) {
+						internImageBucket = imagesArmyBucket[7];
+					} else if ((romulusBucket == 'o' && !flagMovesFirstBucket) || (romulusBucket == 'x' && flagMovesFirstBucket)) {
+						internImageBucket = imagesArmyBucket[6];
+					}
+					
+					if (internImageBucket != null) {
+						g.drawImage(internImageBucket, x, y, PIECE_SIZE_BUCKET, PIECE_SIZE_BUCKET, null);
+					}
+				} else {
+					String[] text = cartBucket.summonStuff(romulusBucket).split("\n");
+					
+					g.drawString(text[0], x + PIECE_SIZE_BUCKET / 4, y + PIECE_SIZE_BUCKET / 2);
+					g.drawString(text[1], x + PIECE_SIZE_BUCKET / 4, y + PIECE_SIZE_BUCKET / 2 + 20);
+					g.drawString(text[2], x + PIECE_SIZE_BUCKET / 4, y + PIECE_SIZE_BUCKET / 2 + 40);
 				}
 			}
 		}
@@ -227,12 +248,29 @@ public class BetrayalParliament extends JPanel {
 		
 //		System.out.println("x: " + String.valueOf(x));
 //		System.out.println("y: " + String.valueOf(y));
+//		if (chaosBucket == 0) {
+//			if (xParkourBucket) {
+//				plankXBucket = 2 - plankXBucket;
+//			}
+//			
+//			if (yParkourBucket) {
+//				plankYBucket = 2 - plankYBucket;
+//			}
+//		}
 		
-		if (plankXBucket < 3 && plankYBucket < 3 && plankRomulusBucket[plankXBucket][plankYBucket] == ' ') {
+		if (plankXBucket < 3 && plankYBucket < 3 && (plankRomulusBucket[plankXBucket][plankYBucket] == ' ' || chaosBucket == 2)) {
+			if (chaosBucket == 2 && plankRomulusBucket[plankXBucket][plankYBucket] != ' ') {
+				while (plankRomulusBucket[plankXBucket][plankYBucket] != ' ') {
+					plankXBucket =  (int) (Math.random() * 3);
+					plankYBucket =  (int) (Math.random() * 3);
+				}
+			}
 			plankRomulusBucket[plankXBucket][plankYBucket] = bozoRomulusBucket;
 			
 			this.repaint();
-			playChaosSound();
+			if (chaosBucket != 0) {
+				playChaosSound();
+			}
 			
 			// wait, then ai moves
 			// NOTE: currently, the user is able to move multiple times within this window.
@@ -249,7 +287,7 @@ public class BetrayalParliament extends JPanel {
 					hoorayYouWonBucket = true;
 				}
 				this.repaint();
-				playChaosSound();
+//				playChaosSound();
 			});
 
 //			this.repaint();
@@ -264,6 +302,7 @@ public class BetrayalParliament extends JPanel {
 	private void drossThisWasYourLoss(Graphics g) {
 		System.out.println("Dross, this was your loss!");
 		g.drawImage(lossImageBucket, 0, PIECE_SIZE_BUCKET / 2, PIECE_SIZE_BUCKET * 3, PIECE_SIZE_BUCKET * 2, null);
+		playDrossSound();
 	}
 
 	private void materializeImages() {
@@ -289,22 +328,59 @@ public class BetrayalParliament extends JPanel {
 	}
 	
 	private void materializeSounds() {
-		soundArmyBucket = new Clip[10]; // TODO: change number
+		soundArmyBucket = new Clip[8];
 		try {
-			File fBucket = new File("src/tempaudio.mp3");
+			File fBucket = new File("src/HELICOPTERHELICOPTER.wav");
 			Clip c = AudioSystem.getClip();
 			c.open(AudioSystem.getAudioInputStream(fBucket));
 			soundArmyBucket[0] = c;
+			fBucket = new File("src/MURICAAA.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[1] = c;
+			fBucket = new File("src/WOW.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[2] = c;
+			fBucket = new File("src/theFitnessGramPacerTestIsAMultistageAerobicCapacityTestThatProgressivelyGetsMoreDifficultAsItContinues.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[3] = c;
+			fBucket = new File("src/Murica.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[4] = c;
+			fBucket = new File("src/rickroll.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[5] = c;
+			fBucket = new File("src/sus.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[6] = c;
+			fBucket = new File("src/violin.wav");
+			c = AudioSystem.getClip();
+			c.open(AudioSystem.getAudioInputStream(fBucket));
+			soundArmyBucket[7] = c;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		activeClip = null; // TODO: set active clip
+		activeClip = soundArmyBucket[0];
 	}
 	
 	private void playChaosSound() {
 		activeClip.stop();
-		activeClip = soundArmyBucket[(int) (Math.random() * soundArmyBucket.length)];
+		activeClip = soundArmyBucket[(int) (Math.random() * (soundArmyBucket.length - 1))];
+		activeClip.setFramePosition(0);
+		activeClip.start();
+	}
+	
+	private void playDrossSound() {
+		activeClip.stop();
+		activeClip = soundArmyBucket[7];
+		activeClip.setFramePosition(0);
 		activeClip.start();
 	}
 
